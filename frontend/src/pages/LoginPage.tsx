@@ -26,7 +26,7 @@ export function LoginPage() {
       <div className="w-full max-w-sm">
 
         {/* Brand mark */}
-        <div className="text-center mb-8">
+        <div className="text-center" style={{ marginBottom: '2.5rem' }}>
           <p className="text-xs font-bold text-subtle uppercase tracking-widest" style={{ marginBottom: '0.625rem' }}>
             Hospital Delivery System
           </p>
