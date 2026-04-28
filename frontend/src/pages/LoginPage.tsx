@@ -34,11 +34,11 @@ export function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-canvas border border-line rounded-lg shadow-sm px-8 py-8">
+        <div className="bg-canvas border border-line rounded-lg shadow-sm" style={{ padding: '2rem 2rem' }}>
           <form onSubmit={handleSubmit}>
-            <div className="space-y-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div>
-                <label className="block text-sm font-medium text-subtle mb-1.5">Email</label>
+                <label className="block text-sm font-medium text-subtle" style={{ marginBottom: '0.5rem' }}>Email</label>
                 <input
                   type="email"
                   value={email}
@@ -49,7 +49,7 @@ export function LoginPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-subtle mb-1.5">Password</label>
+                <label className="block text-sm font-medium text-subtle" style={{ marginBottom: '0.5rem' }}>Password</label>
                 <input
                   type="password"
                   value={password}
@@ -60,7 +60,7 @@ export function LoginPage() {
             </div>
 
             {error && (
-              <div className="mt-5 text-sm text-danger border border-danger-bg rounded-md bg-danger-bg px-4 py-3">
+              <div className="text-sm text-danger border border-danger-bg rounded-md bg-danger-bg px-4 py-3" style={{ marginTop: '1.25rem' }}>
                 {error}
               </div>
             )}
@@ -68,7 +68,8 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-6 w-full btn-primary py-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ marginTop: '1.75rem', paddingBlock: '0.625rem' }}
             >
               {loading ? 'Signing in…' : 'Sign In'}
             </button>
