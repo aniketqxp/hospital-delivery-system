@@ -1,0 +1,361 @@
+@import "tailwindcss";
+
+/* ── Design Tokens ───────────────────────────────────────────
+   All custom tokens declared here. Tailwind utilities are
+   derived from these automatically:
+     --color-ink    →  text-ink, bg-ink, border-ink
+     --color-wash   →  bg-wash
+     --color-line   →  border-line
+   etc.
+──────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Action - Strategic Color */
+  --color-primary:       #0f62fe;   /* Deep deliberate blue */
+  --color-primary-hover: #0043ce;
+
+  /* Text hierarchy */
+  --color-ink:           #111827;   /* primary text   → text-ink    */
+  --color-subtle:        #4b5563;   /* secondary text → text-subtle  */
+  --color-faint:         #9ca3af;   /* placeholder    → text-faint   */
+
+  /* Surfaces & borders */
+  --color-canvas:        #ffffff;   /* default bg     → bg-canvas    */
+  --color-wash:          #f3f4f6;   /* muted bg       → bg-wash      */
+  --color-line:          #e5e7eb;   /* default border → border-line  */
+  --color-line-subtle:   #f3f4f6;   /* faint border   → border-line-subtle */
+  --color-overlay:       rgba(17, 24, 39, 0.4); /* Dark backdrop */
+
+  /* Semantic — delivery type badges */
+  --color-badge-normal-bg:       #ecfdf5;
+  --color-badge-normal-text:     #059669;
+  --color-badge-vacuum-bg:       #fffbeb;
+  --color-badge-vacuum-text:     #d97706;
+  --color-badge-cesarean-bg:     #fef2f2;
+  --color-badge-cesarean-text:   #dc2626;
+
+  /* Status */
+  --color-danger:        #dc2626;
+  --color-danger-bg:     #fef2f2;
+
+  /* Typography */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  /* Named text sizes */
+  --text-2xs: 0.75rem;    /* 12px — tiny timestamps, audit trail   */
+  --text-xs:  0.8125rem;  /* 13px — uppercase labels, badge text   */
+  --text-sm:  0.875rem;   /* 14px — table content, form labels     */
+  --text-base: 1rem;      /* 16px — body, primary prose            */
+  --text-lg:  1.25rem;    /* 20px — page headings                  */
+
+  /* Structural Box Shadow */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+/* ── Base Reset ──────────────────────────────────────────────*/
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-ink);
+  background-color: var(--color-wash);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Focus Ring ──────────────────────────────────────────────*/
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Form Element Normalisation ──────────────────────────────*/
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  border-radius: 6px; /* Soft rounding */
+}
+
+input,
+select,
+textarea {
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-line);
+  padding: 0 0.75rem;
+  height: 2.25rem;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+textarea {
+  height: auto;
+  padding: 0.5rem 0.75rem;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.15); /* Soft focus ring */
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-faint);
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%234b5563'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8 9l4-4 4 4m0 6l-4 4-4-4' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.2rem;
+  padding-right: 2rem;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.1s ease; /* Fast, snappy transitions */
+}
+
+/* ── Typography ──────────────────────────────────────────────*/
+
+h1 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-ink);
+  letter-spacing: -0.01em;
+}
+
+/* ── Tables ──────────────────────────────────────────────────*/
+
+table {
+  border-collapse: separate; /* Required for border-radius on tables if needed, but we wrap in a div */
+  border-spacing: 0;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-subtle);
+  white-space: nowrap;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────*/
+
+::-webkit-scrollbar       { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-faint); }
+
+/* ── Semantic component classes ──────────────────────────────*/
+
+/* Delivery type badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px; /* Pill shape */
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.badge-normal   { background: var(--color-badge-normal-bg);   color: var(--color-badge-normal-text); }
+.badge-vacuum   { background: var(--color-badge-vacuum-bg);   color: var(--color-badge-vacuum-text); }
+.badge-cesarean { background: var(--color-badge-cesarean-bg); color: var(--color-badge-cesarean-text); }
+
+/* Skeleton loading */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.skeleton {
+  background-color: var(--color-line);
+  border-radius: 4px;
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Slide in right for drawers */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Shell layout ────────────────────────────────────────────────────────────*/
+
+:root {
+  --shell-header-height: 3.5rem;
+  --shell-pad-x: 2rem;
+}
+
+.shell-wrap {
+  min-height: 100vh;
+  background-color: var(--color-wash);
+}
+
+.shell-header {
+  height: var(--shell-header-height);
+  background-color: var(--color-canvas);
+  border-bottom: 1px solid var(--color-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: var(--shell-pad-x);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.shell-nav {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+}
+
+.shell-main {
+  max-width: 76rem;
+  margin-inline: auto;
+  padding: 2rem var(--shell-pad-x);
+}
+
+/* Table wrapper */
+.table-outer {
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-line);
+  border-radius: 8px; /* Slightly softer for large containers */
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* Records table internals */
+.records-table thead {
+  background-color: var(--color-line);
+}
+
+.records-table th,
+.records-table td {
+  padding: 0.75rem 1rem;
+}
+
+.records-table th {
+  text-align: left;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-ink);
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.records-table tbody tr {
+  border-bottom: 1px solid var(--color-line-subtle);
+  transition: background-color 0.1s ease;
+}
+
+.records-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Make entire rows interactable and obvious */
+.records-table tbody tr.row-interactive:hover {
+  background-color: var(--color-wash);
+  cursor: pointer;
+}
+
+/* Nav links inside the shell header */
+.shell-nav-link {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-inline: 1rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-subtle);
+  transition: color 0.1s ease, border-color 0.1s ease;
+}
+
+.shell-nav-link:hover {
+  color: var(--color-ink);
+}
+
+.shell-nav-link--active {
+  color: var(--color-ink);
+  border-bottom-color: var(--color-ink);
+}
+
+.shell-nav-link--idle {
+  /* inherits base .shell-nav-link hover styles */
+}
+
+/* Premium Buttons */
+.btn-primary {
+  background-color: var(--color-ink);
+  color: var(--color-canvas);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background-color: #374151;
+}
+
+.btn-secondary {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-wash);
+}

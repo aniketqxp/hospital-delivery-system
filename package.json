@@ -1,0 +1,14 @@
+{
+  "name": "hospital-delivery-system",
+  "version": "1.0.0",
+  "description": "Hospital Delivery Data Management System",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "preview": "cd frontend && npm run preview",
+    "install:all": "cd frontend && npm install"
+  },
+  "keywords": ["hospital", "delivery", "medical", "gynaecology"],
+  "author": "",
+  "license": "UNLICENSED"
+}
