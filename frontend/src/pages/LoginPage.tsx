@@ -27,14 +27,14 @@ export function LoginPage() {
 
         {/* Brand mark */}
         <div className="text-center mb-8">
-          <p className="text-xs font-bold text-subtle uppercase tracking-widest mb-2">
+          <p className="text-xs font-bold text-subtle uppercase tracking-widest" style={{ marginBottom: '0.625rem' }}>
             Hospital Delivery System
           </p>
           <h1 className="text-lg font-bold text-ink">Sign in</h1>
         </div>
 
         {/* Card */}
-        <div className="bg-canvas border border-line rounded-lg shadow-sm" style={{ padding: '2rem 2rem' }}>
+        <div className="bg-canvas border border-line rounded-lg" style={{ padding: '2rem 2rem', boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08)' }}>
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div>
