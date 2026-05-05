@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreateDeliveryRecord } from '../../../../shared/types';
+import { CreateDeliveryRecord } from '@shared/types';
 
 const defaultFormState: CreateDeliveryRecord = {
   patientName: '',
