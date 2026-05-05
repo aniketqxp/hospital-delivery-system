@@ -1,6 +1,7 @@
 {
   "name": "hospital-delivery-system",
   "version": "1.0.0",
+  "private": true,
   "description": "Hospital Delivery Data Management System",
   "scripts": {
     "dev": "cd frontend && npm run dev",
