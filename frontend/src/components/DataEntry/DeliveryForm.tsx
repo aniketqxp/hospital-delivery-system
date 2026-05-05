@@ -77,6 +77,11 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
     }
   };
 
+  const dDate = formData.deliveryDate instanceof Date ? formData.deliveryDate : new Date(formData.deliveryDate);
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  const dateStr = !isNaN(dDate.getTime()) ? `${dDate.getFullYear()}-${pad(dDate.getMonth() + 1)}-${pad(dDate.getDate())}` : '';
+  const timeStr = !isNaN(dDate.getTime()) ? `${pad(dDate.getHours())}:${pad(dDate.getMinutes())}` : '';
+
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: '32rem', paddingTop: '0.75rem' }}>
 
@@ -151,18 +156,33 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
         <SectionHeading>Delivery Information</SectionHeading>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
-          <div>
-            <Label>Date &amp; Time</Label>
-            <input
-              type="datetime-local"
-              value={
-                formData.deliveryDate instanceof Date
-                  ? formData.deliveryDate.toISOString().slice(0, 16)
-                  : new Date(formData.deliveryDate).toISOString().slice(0, 16)
-              }
-              onChange={(e) => setFormData({ ...formData, deliveryDate: new Date(e.target.value) })}
-              required
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <Label>Delivery Date</Label>
+              <input
+                type="date"
+                value={dateStr}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setFormData({ ...formData, deliveryDate: new Date(`${e.target.value}T${timeStr || '00:00'}`) });
+                  }
+                }}
+                required
+              />
+            </div>
+            <div>
+              <Label>Delivery Time</Label>
+              <input
+                type="time"
+                value={timeStr}
+                onChange={(e) => {
+                  if (e.target.value && dateStr) {
+                    setFormData({ ...formData, deliveryDate: new Date(`${dateStr}T${e.target.value}`) });
+                  }
+                }}
+                required
+              />
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
