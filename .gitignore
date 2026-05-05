@@ -49,3 +49,6 @@ coverage/
 
 # Claude Code local settings (personal permissions — not shared)
 .claude/settings.local.json
+
+# Private engineering notes (local reference only)
+TECHNICAL_DETAILS.md
