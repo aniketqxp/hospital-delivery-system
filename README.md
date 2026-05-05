@@ -100,7 +100,7 @@ There is no separate backend server. The React application calls Supabase direct
 **1. Clone the repository**
 
 ```bash
-git clone https://github.com/<your-username>/hospital-delivery-system.git
+git clone https://github.com/aniketqxp/hospital-delivery-system.git
 cd hospital-delivery-system
 ```
 
