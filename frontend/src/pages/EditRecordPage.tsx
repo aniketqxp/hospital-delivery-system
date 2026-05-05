@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { DeliveryForm } from '../components/DataEntry/DeliveryForm';
 import { getDeliveryById, updateDelivery } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-import { CreateDeliveryRecord, DeliveryRecord } from '../../../shared/types';
+import { CreateDeliveryRecord, DeliveryRecord } from '@shared/types';
 
 function toFormData(record: DeliveryRecord): CreateDeliveryRecord {
   return {

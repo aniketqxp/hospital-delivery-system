@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { DeliveryRecord, CreateDeliveryRecord, BabySex, DeliveryType, SearchFilters } from '../../../shared/types';
+import { DeliveryRecord, CreateDeliveryRecord, BabySex, DeliveryType, SearchFilters } from '@shared/types';
 
 function toDeliveryRecord(row: any): DeliveryRecord {
   return {

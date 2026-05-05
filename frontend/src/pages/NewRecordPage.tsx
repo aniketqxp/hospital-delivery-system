@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { DeliveryForm } from '../components/DataEntry/DeliveryForm';
 import { createDelivery } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-import { CreateDeliveryRecord } from '../../../shared/types';
+import { CreateDeliveryRecord } from '@shared/types';
 
 export function NewRecordPage() {
   const { user, profile } = useAuth();

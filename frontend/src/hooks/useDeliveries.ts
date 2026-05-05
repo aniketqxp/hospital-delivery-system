@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DeliveryRecord } from '../../../shared/types';
+import { DeliveryRecord } from '@shared/types';
 import { getAllDeliveries } from '../services/api';
 
 export const useDeliveries = () => {
