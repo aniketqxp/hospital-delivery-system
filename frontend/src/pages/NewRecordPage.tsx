@@ -5,11 +5,30 @@ import { useAuth } from '../contexts/AuthContext';
 import { CreateDeliveryRecord } from '@shared/types';
 
 export function NewRecordPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, profileError } = useAuth();
   const navigate = useNavigate();
 
+  if (profileError) {
+    return (
+      <div>
+        <h1 className="mb-5">New Delivery Record</h1>
+        <p className="text-danger text-sm">
+          Cannot create records: {profileError}
+        </p>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return (
+      <div>
+        <h1 className="mb-5">New Delivery Record</h1>
+        <p className="text-subtle text-sm">Loading account…</p>
+      </div>
+    );
+  }
+
   const handleSubmit = async (data: CreateDeliveryRecord) => {
-    if (!profile || !user) throw new Error('Not authenticated');
     await createDelivery(data, profile.hospitalId, user.id);
     navigate('/records');
   };

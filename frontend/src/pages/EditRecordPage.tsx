@@ -22,7 +22,7 @@ function toFormData(record: DeliveryRecord): CreateDeliveryRecord {
 
 export function EditRecordPage() {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, profileError } = useAuth();
   const navigate = useNavigate();
 
   const [record, setRecord] = useState<DeliveryRecord | null>(null);
@@ -41,10 +41,24 @@ export function EditRecordPage() {
     navigate('/records');
   };
 
+  if (profileError) {
+    return (
+      <div>
+        <p className="text-danger mb-3">Cannot edit records: {profileError}</p>
+        <button
+          onClick={() => navigate('/records')}
+          className="text-sm text-subtle hover:text-ink underline"
+        >
+          ← Back to Records
+        </button>
+      </div>
+    );
+  }
+
   if (loadError) {
     return (
       <div>
-        <p className="text-danger mb-3">Failed to load record: {loadError}</p>
+        <p className="text-danger mb-3">{loadError}</p>
         <button
           onClick={() => navigate('/records')}
           className="text-sm text-subtle hover:text-ink underline"
@@ -56,7 +70,7 @@ export function EditRecordPage() {
   }
 
   if (!record) {
-    return <p className="text-subtle">Loading record...</p>;
+    return <p className="text-subtle">Loading record…</p>;
   }
 
   return (

@@ -75,9 +75,56 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
+
+    const trimmedName = formData.patientName.trim();
+    const trimmedAddress = formData.patientAddress.trim();
+
+    if (!trimmedName) {
+      setError('Patient name cannot be empty.');
+      return;
+    }
+    if (!trimmedAddress) {
+      setError('Address cannot be empty.');
+      return;
+    }
+    if (!Number.isInteger(formData.patientAge) || formData.patientAge < 1 || formData.patientAge > 120) {
+      setError('Age must be a whole number between 1 and 120.');
+      return;
+    }
+    const dDateLocal = formData.deliveryDate instanceof Date ? formData.deliveryDate : new Date(formData.deliveryDate);
+    if (isNaN(dDateLocal.getTime())) {
+      setError('Delivery date and time are invalid.');
+      return;
+    }
+    if (dDateLocal.getTime() > Date.now()) {
+      setError('Delivery date cannot be in the future.');
+      return;
+    }
+    if (
+      formData.aadhaarLast4 &&
+      formData.aadhaarLast4.trim() !== '' &&
+      !/^[0-9]{4}$/.test(formData.aadhaarLast4.trim())
+    ) {
+      setError('Aadhaar Last 4 must be exactly 4 digits.');
+      return;
+    }
+    if (formData.babyWeightKg != null && (formData.babyWeightKg <= 0 || formData.babyWeightKg > 8)) {
+      setError('Baby weight must be between 0.1 and 8 kg.');
+      return;
+    }
+
+    const sanitized: CreateDeliveryRecord = {
+      ...formData,
+      patientName: trimmedName,
+      patientAddress: trimmedAddress,
+      patientTaluka: formData.patientTaluka?.trim() || undefined,
+      patientDistrict: formData.patientDistrict?.trim() || undefined,
+      aadhaarLast4: formData.aadhaarLast4?.trim() || undefined,
+    };
+
     setSubmitting(true);
     try {
-      await onSubmit(formData);
+      await onSubmit(sanitized);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
     } finally {
@@ -90,6 +137,9 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
   const dateStr = !isNaN(dDate.getTime())
     ? `${dDate.getFullYear()}-${pad(dDate.getMonth() + 1)}-${pad(dDate.getDate())}`
     : '';
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
 
   const hours24 = !isNaN(dDate.getTime()) ? dDate.getHours() : 0;
   const hours12 = hours24 === 0 ? 12 : hours24 > 12 ? hours24 - 12 : hours24;
@@ -136,6 +186,7 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
                 required
                 min="1"
                 max="120"
+                step="1"
               />
             </div>
             <div>
@@ -148,9 +199,13 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
               </label>
               <input
                 type="text"
+                inputMode="numeric"
                 name="aadhaarLast4"
                 value={formData.aadhaarLast4 ?? ''}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 4);
+                  setFormData(prev => ({ ...prev, aadhaarLast4: digitsOnly }));
+                }}
                 pattern="[0-9]{4}"
                 title="Exactly 4 digits"
                 maxLength={4}
@@ -223,6 +278,7 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
               <input
                 type="date"
                 value={dateStr}
+                max={todayStr}
                 onChange={(e) => {
                   if (e.target.value) {
                     const updated = new Date(`${e.target.value}T${pad(hours24)}:${pad(currentMinutes)}`);

@@ -35,12 +35,16 @@ CREATE TABLE delivery_records (
   id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   hospital_id       UUID        NOT NULL REFERENCES hospitals(id),
   serial_number     TEXT        NOT NULL,
-  patient_name      TEXT        NOT NULL,
+  patient_name      TEXT        NOT NULL
+                                CHECK (length(patient_name) BETWEEN 1 AND 100
+                                       AND length(trim(patient_name)) > 0),
   patient_name_lower TEXT       NOT NULL,
-  patient_age       INTEGER     NOT NULL CHECK (patient_age > 0),
-  patient_address   TEXT        NOT NULL,
-  patient_taluka    TEXT,
-  patient_district  TEXT,
+  patient_age       INTEGER     NOT NULL CHECK (patient_age BETWEEN 1 AND 120),
+  patient_address   TEXT        NOT NULL
+                                CHECK (length(patient_address) BETWEEN 1 AND 400
+                                       AND length(trim(patient_address)) > 0),
+  patient_taluka    TEXT        CHECK (patient_taluka IS NULL OR length(patient_taluka) <= 80),
+  patient_district  TEXT        CHECK (patient_district IS NULL OR length(patient_district) <= 80),
   aadhaar_last4     CHAR(4)     CHECK (aadhaar_last4 ~ '^[0-9]{4}$'),
   delivery_date     TIMESTAMPTZ NOT NULL,
   baby_sex          TEXT        NOT NULL
@@ -180,3 +184,21 @@ CREATE POLICY "no direct access" ON serial_counters
 --     ADD COLUMN IF NOT EXISTS patient_taluka   TEXT,
 --     ADD COLUMN IF NOT EXISTS patient_district TEXT,
 --     ADD COLUMN IF NOT EXISTS baby_weight_kg   NUMERIC(4,2) CHECK (baby_weight_kg > 0);
+--
+-- Robustness pass — add length and content CHECK constraints:
+--
+--   ALTER TABLE delivery_records
+--     ADD CONSTRAINT patient_name_check
+--       CHECK (length(patient_name) BETWEEN 1 AND 100
+--              AND length(trim(patient_name)) > 0),
+--     ADD CONSTRAINT patient_address_check
+--       CHECK (length(patient_address) BETWEEN 1 AND 400
+--              AND length(trim(patient_address)) > 0),
+--     ADD CONSTRAINT patient_taluka_check
+--       CHECK (patient_taluka IS NULL OR length(patient_taluka) <= 80),
+--     ADD CONSTRAINT patient_district_check
+--       CHECK (patient_district IS NULL OR length(patient_district) <= 80),
+--     ADD CONSTRAINT patient_age_check
+--       CHECK (patient_age BETWEEN 1 AND 120);
+--   -- Drop the old narrower constraint on patient_age:
+--   ALTER TABLE delivery_records DROP CONSTRAINT IF EXISTS delivery_records_patient_age_check;

@@ -45,6 +45,7 @@ export function RecordsTable() {
   const [searchError, setSearchError]         = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deletingId, setDeletingId]           = useState<string | null>(null);
+  const [deleteError, setDeleteError]         = useState<string | null>(null);
   const [menuState, setMenuState]             = useState<MenuState | null>(null);
 
   useEffect(() => {
@@ -64,6 +65,7 @@ export function RecordsTable() {
   const handleDelete = async (id: string) => {
     setConfirmDeleteId(null);
     setDeletingId(id);
+    setDeleteError(null);
     try {
       await deleteDelivery(id);
       if (viewMode === 'all') {
@@ -71,8 +73,8 @@ export function RecordsTable() {
       } else {
         setSearchResults(prev => prev.filter(r => r.id !== id));
       }
-    } catch {
-      if (viewMode === 'all') refetch();
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Failed to delete record');
     } finally {
       setDeletingId(null);
     }
@@ -157,6 +159,7 @@ export function RecordsTable() {
           onSearch={setSearchResults}
           onLoading={setSearchLoading}
           onError={setSearchError}
+          onReset={switchToAll}
         />
       )}
 
@@ -169,6 +172,33 @@ export function RecordsTable() {
             className="underline hover:no-underline"
           >
             {viewMode === 'all' ? 'try again' : 'clear search'}
+          </button>
+        </div>
+      )}
+
+      {/* ── Delete error ── */}
+      {deleteError && (
+        <div
+          role="alert"
+          className="text-sm text-danger mb-3"
+          style={{
+            padding: '0.625rem 0.875rem',
+            borderRadius: '6px',
+            backgroundColor: 'var(--color-danger-bg)',
+            border: '1px solid var(--color-danger-bg)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '0.75rem',
+          }}
+        >
+          <span>{deleteError}</span>
+          <button
+            onClick={() => setDeleteError(null)}
+            style={{ color: 'var(--color-danger)', fontWeight: 600, fontSize: 'var(--text-xs)' }}
+            className="hover:underline"
+          >
+            Dismiss
           </button>
         </div>
       )}

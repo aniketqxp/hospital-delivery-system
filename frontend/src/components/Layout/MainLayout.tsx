@@ -7,7 +7,7 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const { profile, signOut } = useAuth();
+  const { profile, profileError, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -31,6 +31,22 @@ export function MainLayout({ children }: MainLayoutProps) {
           Sign out
         </button>
       </header>
+
+      {profileError && (
+        <div
+          role="alert"
+          style={{
+            padding: '0.75rem 1.5rem',
+            backgroundColor: 'var(--color-danger-bg)',
+            color: 'var(--color-danger)',
+            borderBottom: '1px solid var(--color-line)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 500,
+          }}
+        >
+          {profileError}
+        </div>
+      )}
 
       <main className="shell-main">
         {children}

@@ -6,6 +6,7 @@ interface AdvancedSearchProps {
   onSearch: (results: DeliveryRecord[]) => void;
   onLoading: (loading: boolean) => void;
   onError: (error: string | null) => void;
+  onReset: () => void;
 }
 
 const emptyFilters: SearchFilters = {
@@ -17,10 +18,16 @@ const emptyFilters: SearchFilters = {
   deliveryType: '',
 };
 
-export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch, onLoading, onError }) => {
+export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch, onLoading, onError, onReset }) => {
   const [filters, setFilters] = useState<SearchFilters>(emptyFilters);
 
+  const hasAnyFilter = Object.values(filters).some((v) => v && v.trim() !== '');
+
   const handleSearch = async () => {
+    if (!hasAnyFilter) {
+      onError('Enter at least one search filter.');
+      return;
+    }
     onLoading(true);
     onError(null);
     try {
@@ -35,7 +42,8 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch, onLoad
 
   const handleReset = () => {
     setFilters(emptyFilters);
-    onSearch([]);
+    onError(null);
+    onReset();
   };
 
   const set = (field: keyof SearchFilters, value: string) =>

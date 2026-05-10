@@ -10,6 +10,7 @@ interface UserProfile {
 interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
+  profileError: string | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -35,6 +36,7 @@ async function fetchProfile(userId: string): Promise<UserProfile | null> {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,19 +44,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       (_event, session) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
-
-        // Clear the loading gate immediately — we know whether there's a
-        // session without waiting for any network call.
         setLoading(false);
 
-        // Profile fetch is best-effort and runs in the background.
-        // A hang or failure here never blocks the app from rendering.
         if (currentUser) {
           fetchProfile(currentUser.id)
-            .then(setProfile)
-            .catch(() => setProfile(null));
+            .then((p) => {
+              if (!p) {
+                setProfile(null);
+                setProfileError(
+                  'Your account is not linked to a hospital. Contact your administrator.'
+                );
+              } else {
+                setProfile(p);
+                setProfileError(null);
+              }
+            })
+            .catch((err) => {
+              setProfile(null);
+              setProfileError(err instanceof Error ? err.message : 'Failed to load profile');
+            });
         } else {
           setProfile(null);
+          setProfileError(null);
         }
       }
     );
@@ -72,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, profile, profileError, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
