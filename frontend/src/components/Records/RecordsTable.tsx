@@ -179,7 +179,7 @@ export function RecordsTable() {
         <div className="table-scroll">
           <table className="records-table" style={{ width: '100%', tableLayout: 'fixed' }}>
             <colgroup>
-              <col style={{ width: '56px' }} />
+              <col style={{ width: '108px' }} />
               <col />
               <col style={{ width: '56px' }} />
               <col style={{ width: '176px' }} />
@@ -218,7 +218,7 @@ export function RecordsTable() {
                       onClick={() => setSelectedRecord(record)}
                     >
                       <td style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-2xs)', color: 'var(--color-faint)' }}>
-                        {record.serialNumber.split('-').pop()}
+                        {record.serialNumber}
                       </td>
                       <td style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {record.patientName}
