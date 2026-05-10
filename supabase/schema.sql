@@ -156,6 +156,11 @@ CREATE POLICY "hospital update" ON delivery_records
     hospital_id = (SELECT hospital_id FROM user_profiles WHERE id = auth.uid())
   );
 
+CREATE POLICY "hospital delete" ON delivery_records
+  FOR DELETE USING (
+    hospital_id = (SELECT hospital_id FROM user_profiles WHERE id = auth.uid())
+  );
+
 -- Serial counters: no direct client access (only via SECURITY DEFINER trigger)
 CREATE POLICY "no direct access" ON serial_counters
   USING (false);

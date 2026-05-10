@@ -131,11 +131,16 @@ export async function updateDelivery(
 }
 
 export async function deleteDelivery(id: string): Promise<void> {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('delivery_records')
     .delete()
-    .eq('id', id);
+    .eq('id', id)
+    .select('id');
+
   if (error) throw humanizeError(error);
+  if (!data || data.length === 0) {
+    throw new Error('Delete did not affect any record. You may not have permission, or the record no longer exists.');
+  }
 }
 
 export async function searchDeliveries(filters: SearchFilters): Promise<DeliveryRecord[]> {
