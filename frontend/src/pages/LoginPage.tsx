@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export function LoginPage() {
@@ -6,7 +6,15 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem('sessionExpiredFlash')) {
+      setNotice('Your session expired. Please sign in again.');
+      sessionStorage.removeItem('sessionExpiredFlash');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +43,22 @@ export function LoginPage() {
 
         {/* Card */}
         <div className="bg-canvas border border-line rounded-lg" style={{ padding: '2rem 2rem', boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08)' }}>
+          {notice && (
+            <div
+              role="status"
+              style={{
+                marginBottom: '1.25rem',
+                padding: '0.625rem 0.875rem',
+                borderRadius: '6px',
+                backgroundColor: 'var(--color-wash)',
+                border: '1px solid var(--color-line)',
+                color: 'var(--color-subtle)',
+                fontSize: 'var(--text-sm)',
+              }}
+            >
+              {notice}
+            </div>
+          )}
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div>

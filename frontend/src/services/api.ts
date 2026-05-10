@@ -2,6 +2,8 @@ import { supabase } from '../lib/supabase';
 import { DeliveryRecord, CreateDeliveryRecord, BabySex, DeliveryType, SearchFilters } from '@shared/types';
 
 // Translate Supabase / PostgREST errors to messages a hospital staffer can act on.
+// Side effect: when the failure is a session-expired error, trigger sign-out so
+// the app routes the user back to the login screen with a one-time notice.
 function humanizeError(error: unknown): Error {
   if (!error) return new Error('Unknown error');
   const e = error as { code?: string; message?: string; name?: string };
@@ -9,6 +11,8 @@ function humanizeError(error: unknown): Error {
 
   if (e.code === 'PGRST116') return new Error('Record not found.');
   if (msg.includes('JWT expired') || msg.includes('Invalid Refresh Token') || e.code === 'PGRST301') {
+    sessionStorage.setItem('sessionExpiredFlash', '1');
+    supabase.auth.signOut().catch(() => { /* swallow — user gets redirected regardless */ });
     return new Error('Your session has expired. Please sign in again.');
   }
   if (msg === 'Failed to fetch' || e.name === 'TypeError') {
@@ -52,14 +56,21 @@ function toDeliveryRecord(row: any): DeliveryRecord {
   };
 }
 
-export async function getAllDeliveries(): Promise<DeliveryRecord[]> {
+export async function getDeliveriesPage(
+  offset: number,
+  limit: number
+): Promise<{ records: DeliveryRecord[]; hasMore: boolean }> {
+  // Fetch limit+1 rows; if we got more than asked, there's another page.
   const { data, error } = await supabase
     .from('delivery_records')
     .select('*, hospitals(name)')
-    .order('delivery_date', { ascending: false });
+    .order('delivery_date', { ascending: false })
+    .range(offset, offset + limit);
 
   if (error) throw humanizeError(error);
-  return (data ?? []).map(toDeliveryRecord);
+  const all = (data ?? []).map(toDeliveryRecord);
+  const hasMore = all.length > limit;
+  return { records: hasMore ? all.slice(0, limit) : all, hasMore };
 }
 
 export async function createDelivery(

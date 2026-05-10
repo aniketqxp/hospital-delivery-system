@@ -37,7 +37,7 @@ type MenuState = { id: string; top: number; right: number };
 type ConfirmDeleteState = { id: string; top: number; right: number };
 
 export function RecordsTable() {
-  const { deliveries, loading, error, refetch } = useDeliveries();
+  const { deliveries, loading, loadingMore, hasMore, error, refetch, loadMore, removeFromCache } = useDeliveries();
   const navigate = useNavigate();
   const [selectedRecord, setSelectedRecord]   = useState<DeliveryRecord | null>(null);
   const [viewMode, setViewMode]               = useState<'all' | 'search'>('all');
@@ -79,7 +79,7 @@ export function RecordsTable() {
     try {
       await deleteDelivery(id);
       if (viewMode === 'all') {
-        refetch();
+        removeFromCache(id);
       } else {
         setSearchResults(prev => prev.filter(r => r.id !== id));
       }
@@ -109,7 +109,8 @@ export function RecordsTable() {
           ) : (
             !loading && (
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-subtle)' }}>
-                {deliveries.length} record{deliveries.length !== 1 ? 's' : ''}
+                {deliveries.length}
+                {hasMore ? '+' : ''} record{deliveries.length !== 1 ? 's' : ''}
               </span>
             )
           )}
@@ -305,6 +306,20 @@ export function RecordsTable() {
           </table>
         </div>
       </div>
+
+      {/* ── Load more ── */}
+      {viewMode === 'all' && !loading && hasMore && (
+        <div style={{ display: 'flex', justifyContent: 'center', paddingBlock: '1rem' }}>
+          <button
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="btn-secondary disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loadingMore ? 'Loading…' : 'Load more'}
+          </button>
+        </div>
+      )}
+
 
       {/* ── Context menu — fixed so it overlays everything ── */}
       {menuState && (
