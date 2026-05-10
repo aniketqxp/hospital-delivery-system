@@ -190,7 +190,7 @@ export function RecordsTable() {
 
             <thead>
               <tr>
-                {['Serial', 'Patient', 'Age', 'Date / Time', 'Sex', 'Type', ''].map((h) => (
+                {['#', 'Patient', 'Age', 'Date / Time', 'Sex', 'Type', ''].map((h) => (
                   <th key={h}>{h}</th>
                 ))}
               </tr>
@@ -220,7 +220,7 @@ export function RecordsTable() {
                       <td style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-2xs)', color: 'var(--color-faint)' }}>
                         {record.serialNumber.split('-').pop()}
                       </td>
-                      <td style={{ fontWeight: 600 }}>
+                      <td style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {record.patientName}
                       </td>
                       <td>
@@ -232,7 +232,7 @@ export function RecordsTable() {
                           {format(new Date(record.deliveryDate), 'hh:mm a')}
                         </div>
                       </td>
-                      <td>
+                      <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {record.babySex}
                       </td>
                       <td>

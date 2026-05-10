@@ -120,6 +120,7 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
               value={formData.patientName}
               onChange={handleInputChange}
               required
+              maxLength={100}
               placeholder="Full name"
             />
           </div>
@@ -166,6 +167,7 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
               onChange={handleInputChange}
               required
               rows={3}
+              maxLength={400}
               placeholder="House / street / village"
             />
           </div>
@@ -184,6 +186,7 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
                 name="patientTaluka"
                 value={formData.patientTaluka ?? ''}
                 onChange={handleInputChange}
+                maxLength={80}
                 placeholder="e.g. Shirur"
               />
             </div>
@@ -200,6 +203,7 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
                 name="patientDistrict"
                 value={formData.patientDistrict ?? ''}
                 onChange={handleInputChange}
+                maxLength={80}
                 placeholder="e.g. Pune"
               />
             </div>

@@ -106,6 +106,9 @@ export const RecordDetailsModal: React.FC<RecordDetailsModalProps> = ({ record, 
               color: 'var(--color-ink)',
               letterSpacing: '-0.01em',
               lineHeight: 1.25,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}>
               {record.patientName}
             </h2>
