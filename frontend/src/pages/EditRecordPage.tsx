@@ -10,10 +10,13 @@ function toFormData(record: DeliveryRecord): CreateDeliveryRecord {
     patientName: record.patientName,
     patientAge: record.patientAge,
     patientAddress: record.patientAddress,
+    patientTaluka: record.patientTaluka,
+    patientDistrict: record.patientDistrict,
     aadhaarLast4: record.aadhaarLast4,
     deliveryDate: record.deliveryDate,
     babySex: record.babySex,
     deliveryType: record.deliveryType,
+    babyWeightKg: record.babyWeightKg,
   };
 }
 

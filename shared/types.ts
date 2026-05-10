@@ -16,10 +16,13 @@ export interface DeliveryRecord {
   patientName: string;
   patientAge: number;
   patientAddress: string;
+  patientTaluka?: string;
+  patientDistrict?: string;
   aadhaarLast4?: string;
   deliveryDate: Date;
   babySex: BabySex;
   deliveryType: DeliveryType;
+  babyWeightKg?: number;
   hospitalName: string;
   createdAt: Date;
   updatedAt: Date;

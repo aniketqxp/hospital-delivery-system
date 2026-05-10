@@ -134,13 +134,22 @@ export const RecordDetailsModal: React.FC<RecordDetailsModalProps> = ({ record, 
                 <>
                   {format(new Date(record.deliveryDate), 'dd MMM yyyy')}
                   <span style={{ color: 'var(--color-subtle)', marginLeft: '0.5rem' }}>
-                    {format(new Date(record.deliveryDate), 'HH:mm')}
+                    {format(new Date(record.deliveryDate), 'hh:mm a')}
                   </span>
                 </>
               }
             />
             <FieldRow label="Type" value={record.deliveryType} divider />
             <FieldRow label="Baby Sex" value={record.babySex} divider />
+            <FieldRow
+              label="Baby Weight"
+              value={
+                record.babyWeightKg != null
+                  ? `${record.babyWeightKg.toFixed(2)} kg`
+                  : <span style={{ color: 'var(--color-faint)', fontStyle: 'italic', fontWeight: 400 }}>Not recorded</span>
+              }
+              divider
+            />
             <FieldRow label="Hospital" value={record.hospitalName} divider />
           </Section>
 
@@ -164,6 +173,15 @@ export const RecordDetailsModal: React.FC<RecordDetailsModalProps> = ({ record, 
               }
               divider
             />
+            {(record.patientTaluka || record.patientDistrict) && (
+              <FieldRow
+                label="Taluka / District"
+                value={
+                  [record.patientTaluka, record.patientDistrict].filter(Boolean).join(', ')
+                }
+                divider
+              />
+            )}
           </Section>
 
         </div>

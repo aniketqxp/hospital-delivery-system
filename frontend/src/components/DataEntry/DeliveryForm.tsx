@@ -5,10 +5,13 @@ const defaultFormState: CreateDeliveryRecord = {
   patientName: '',
   patientAge: 0,
   patientAddress: '',
+  patientTaluka: '',
+  patientDistrict: '',
   aadhaarLast4: '',
   deliveryDate: new Date(),
   babySex: 'Male',
   deliveryType: 'Full Term Normal Delivery',
+  babyWeightKg: undefined,
 };
 
 interface DeliveryFormProps {
@@ -43,6 +46,11 @@ const Label: React.FC<{ children: React.ReactNode; htmlFor?: string }> = ({ chil
     {children}
   </label>
 );
+
+function to24Hour(h: number, period: 'AM' | 'PM'): number {
+  if (period === 'AM') return h === 12 ? 0 : h;
+  return h === 12 ? 12 : h + 12;
+}
 
 export const DeliveryForm: React.FC<DeliveryFormProps> = ({
   initialData,
@@ -79,8 +87,22 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
 
   const dDate = formData.deliveryDate instanceof Date ? formData.deliveryDate : new Date(formData.deliveryDate);
   const pad = (n: number) => n.toString().padStart(2, '0');
-  const dateStr = !isNaN(dDate.getTime()) ? `${dDate.getFullYear()}-${pad(dDate.getMonth() + 1)}-${pad(dDate.getDate())}` : '';
-  const timeStr = !isNaN(dDate.getTime()) ? `${pad(dDate.getHours())}:${pad(dDate.getMinutes())}` : '';
+  const dateStr = !isNaN(dDate.getTime())
+    ? `${dDate.getFullYear()}-${pad(dDate.getMonth() + 1)}-${pad(dDate.getDate())}`
+    : '';
+
+  const hours24 = !isNaN(dDate.getTime()) ? dDate.getHours() : 0;
+  const hours12 = hours24 === 0 ? 12 : hours24 > 12 ? hours24 - 12 : hours24;
+  const ampm: 'AM' | 'PM' = hours24 < 12 ? 'AM' : 'PM';
+  const currentMinutes = !isNaN(dDate.getTime()) ? dDate.getMinutes() : 0;
+
+  const updateTime = (newHours24: number, newMinutes: number) => {
+    const updated = new Date(dDate);
+    updated.setHours(newHours24, newMinutes, 0, 0);
+    setFormData(prev => ({ ...prev, deliveryDate: updated }));
+  };
+
+  const selectStyle: React.CSSProperties = { flex: '0 0 auto' };
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: '32rem', paddingTop: '0.75rem' }}>
@@ -144,8 +166,43 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
               onChange={handleInputChange}
               required
               rows={3}
-              placeholder="Patient's residential address"
+              placeholder="House / street / village"
             />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <label
+                className="text-sm font-medium text-subtle"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.5rem' }}
+              >
+                Taluka
+                <span className="text-xs font-normal text-faint">(optional)</span>
+              </label>
+              <input
+                type="text"
+                name="patientTaluka"
+                value={formData.patientTaluka ?? ''}
+                onChange={handleInputChange}
+                placeholder="e.g. Shirur"
+              />
+            </div>
+            <div>
+              <label
+                className="text-sm font-medium text-subtle"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.5rem' }}
+              >
+                District
+                <span className="text-xs font-normal text-faint">(optional)</span>
+              </label>
+              <input
+                type="text"
+                name="patientDistrict"
+                value={formData.patientDistrict ?? ''}
+                onChange={handleInputChange}
+                placeholder="e.g. Pune"
+              />
+            </div>
           </div>
 
         </div>
@@ -164,7 +221,8 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
                 value={dateStr}
                 onChange={(e) => {
                   if (e.target.value) {
-                    setFormData({ ...formData, deliveryDate: new Date(`${e.target.value}T${timeStr || '00:00'}`) });
+                    const updated = new Date(`${e.target.value}T${pad(hours24)}:${pad(currentMinutes)}`);
+                    setFormData(prev => ({ ...prev, deliveryDate: updated }));
                   }
                 }}
                 required
@@ -172,16 +230,38 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
             </div>
             <div>
               <Label>Delivery Time</Label>
-              <input
-                type="time"
-                value={timeStr}
-                onChange={(e) => {
-                  if (e.target.value && dateStr) {
-                    setFormData({ ...formData, deliveryDate: new Date(`${dateStr}T${e.target.value}`) });
-                  }
-                }}
-                required
-              />
+              <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center' }}>
+                <select
+                  value={hours12}
+                  onChange={(e) => updateTime(to24Hour(parseInt(e.target.value, 10), ampm), currentMinutes)}
+                  style={selectStyle}
+                  required
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
+                    <option key={h} value={h}>{h}</option>
+                  ))}
+                </select>
+                <span style={{ color: 'var(--color-subtle)', fontWeight: 600, userSelect: 'none' }}>:</span>
+                <select
+                  value={currentMinutes}
+                  onChange={(e) => updateTime(hours24, parseInt(e.target.value, 10))}
+                  style={selectStyle}
+                  required
+                >
+                  {Array.from({ length: 60 }, (_, i) => (
+                    <option key={i} value={i}>{pad(i)}</option>
+                  ))}
+                </select>
+                <select
+                  value={ampm}
+                  onChange={(e) => updateTime(to24Hour(hours12, e.target.value as 'AM' | 'PM'), currentMinutes)}
+                  style={selectStyle}
+                  required
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -204,6 +284,29 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({
                 <option value="Cesarean Section">Cesarean Section</option>
               </select>
             </div>
+          </div>
+
+          <div style={{ maxWidth: '14rem' }}>
+            <label
+              className="text-sm font-medium text-subtle"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.5rem' }}
+            >
+              Baby Weight
+              <span className="text-xs font-normal text-faint">(kg, optional)</span>
+            </label>
+            <input
+              type="number"
+              name="babyWeightKg"
+              value={formData.babyWeightKg ?? ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFormData(prev => ({ ...prev, babyWeightKg: val === '' ? undefined : parseFloat(val) }));
+              }}
+              min="0.1"
+              max="8"
+              step="0.01"
+              placeholder="e.g. 3.20"
+            />
           </div>
 
         </div>

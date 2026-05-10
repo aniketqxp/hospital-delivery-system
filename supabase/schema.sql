@@ -39,6 +39,8 @@ CREATE TABLE delivery_records (
   patient_name_lower TEXT       NOT NULL,
   patient_age       INTEGER     NOT NULL CHECK (patient_age > 0),
   patient_address   TEXT        NOT NULL,
+  patient_taluka    TEXT,
+  patient_district  TEXT,
   aadhaar_last4     CHAR(4)     CHECK (aadhaar_last4 ~ '^[0-9]{4}$'),
   delivery_date     TIMESTAMPTZ NOT NULL,
   baby_sex          TEXT        NOT NULL
@@ -54,6 +56,7 @@ CREATE TABLE delivery_records (
                                   'Vacuum Delivery',
                                   'Cesarean Section'
                                 )),
+  baby_weight_kg    NUMERIC(4,2) CHECK (baby_weight_kg > 0),
   created_at        TIMESTAMPTZ DEFAULT NOW(),
   updated_at        TIMESTAMPTZ DEFAULT NOW(),
   created_by        UUID        REFERENCES auth.users(id),
@@ -167,3 +170,13 @@ CREATE POLICY "no direct access" ON serial_counters
 --   -- Use the returned id in the next statement:
 --   INSERT INTO user_profiles (id, hospital_id, display_name)
 --   VALUES ('<user-uuid-from-auth>', '<hospital-id-from-above>', 'Staff Name');
+
+
+-- ── Migration (existing databases only) ───────────────────────
+-- If the delivery_records table already exists, run these ALTER statements
+-- instead of the full CREATE TABLE above:
+--
+--   ALTER TABLE delivery_records
+--     ADD COLUMN IF NOT EXISTS patient_taluka   TEXT,
+--     ADD COLUMN IF NOT EXISTS patient_district TEXT,
+--     ADD COLUMN IF NOT EXISTS baby_weight_kg   NUMERIC(4,2) CHECK (baby_weight_kg > 0);

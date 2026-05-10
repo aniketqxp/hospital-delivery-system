@@ -229,7 +229,7 @@ export function RecordsTable() {
                       <td>
                         <div>{format(new Date(record.deliveryDate), 'dd MMM yyyy')}</div>
                         <div style={{ fontSize: 'var(--text-2xs)', color: 'var(--color-subtle)' }}>
-                          {format(new Date(record.deliveryDate), 'HH:mm')}
+                          {format(new Date(record.deliveryDate), 'hh:mm a')}
                         </div>
                       </td>
                       <td>
