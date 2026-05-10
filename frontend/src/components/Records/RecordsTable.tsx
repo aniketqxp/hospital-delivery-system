@@ -21,7 +21,6 @@ function SkeletonRows() {
     <>
       {[1, 2, 3].map((i) => (
         <tr key={i}>
-          <td><div className="skeleton" style={{ height: '1rem', width: '7rem' }} /></td>
           <td><div className="skeleton" style={{ height: '1rem', width: '9rem' }} /></td>
           <td><div className="skeleton" style={{ height: '1rem', width: '2rem' }} /></td>
           <td><div className="skeleton" style={{ height: '1rem', width: '7rem' }} /></td>
@@ -179,7 +178,6 @@ export function RecordsTable() {
         <div className="table-scroll">
           <table className="records-table" style={{ width: '100%', tableLayout: 'fixed' }}>
             <colgroup>
-              <col style={{ width: '108px' }} />
               <col />
               <col style={{ width: '56px' }} />
               <col style={{ width: '176px' }} />
@@ -190,7 +188,7 @@ export function RecordsTable() {
 
             <thead>
               <tr>
-                {['#', 'Patient', 'Age', 'Date / Time', 'Sex', 'Type', ''].map((h) => (
+                {['Patient', 'Age', 'Date / Time', 'Sex', 'Type', ''].map((h) => (
                   <th key={h}>{h}</th>
                 ))}
               </tr>
@@ -201,7 +199,7 @@ export function RecordsTable() {
                 <SkeletonRows />
               ) : displayed.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--color-subtle)' }}>
+                  <td colSpan={6} style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--color-subtle)' }}>
                     {viewMode === 'all'
                       ? 'No delivery records yet.'
                       : 'No records match your search criteria.'}
@@ -217,9 +215,6 @@ export function RecordsTable() {
                       className="row-interactive"
                       onClick={() => setSelectedRecord(record)}
                     >
-                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-2xs)', color: 'var(--color-faint)' }}>
-                        {record.serialNumber}
-                      </td>
                       <td style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {record.patientName}
                       </td>

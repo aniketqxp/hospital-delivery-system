@@ -89,16 +89,16 @@ export const RecordDetailsModal: React.FC<RecordDetailsModalProps> = ({ record, 
           alignItems: 'flex-start',
           gap: '1rem',
         }}>
-          <div>
+          <div style={{ minWidth: 0, flex: 1 }}>
             <p style={{
               fontSize: 'var(--text-2xs)',
               fontWeight: 500,
               color: 'var(--color-faint)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
+              fontFamily: 'var(--font-mono)',
+              letterSpacing: '0.04em',
               marginBottom: '0.3125rem',
             }}>
-              Patient Record
+              {record.serialNumber}
             </p>
             <h2 style={{
               fontSize: '1.25rem',
