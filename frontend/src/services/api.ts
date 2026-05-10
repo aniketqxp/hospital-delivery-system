@@ -27,7 +27,7 @@ export async function getAllDeliveries(): Promise<DeliveryRecord[]> {
   const { data, error } = await supabase
     .from('delivery_records')
     .select('*, hospitals(name)')
-    .order('created_at', { ascending: false });
+    .order('delivery_date', { ascending: false });
 
   if (error) throw new Error(error.message);
   return (data ?? []).map(toDeliveryRecord);
