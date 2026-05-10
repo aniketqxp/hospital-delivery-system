@@ -34,6 +34,7 @@ function SkeletonRows() {
 }
 
 type MenuState = { id: string; top: number; right: number };
+type ConfirmDeleteState = { id: string; top: number; right: number };
 
 export function RecordsTable() {
   const { deliveries, loading, error, refetch } = useDeliveries();
@@ -43,7 +44,7 @@ export function RecordsTable() {
   const [searchResults, setSearchResults]     = useState<DeliveryRecord[]>([]);
   const [searchLoading, setSearchLoading]     = useState(false);
   const [searchError, setSearchError]         = useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete]     = useState<ConfirmDeleteState | null>(null);
   const [deletingId, setDeletingId]           = useState<string | null>(null);
   const [deleteError, setDeleteError]         = useState<string | null>(null);
   const [menuState, setMenuState]             = useState<MenuState | null>(null);
@@ -55,6 +56,15 @@ export function RecordsTable() {
     return () => document.removeEventListener('mousedown', close);
   }, [menuState]);
 
+  useEffect(() => {
+    if (!confirmDelete) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setConfirmDelete(null);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [confirmDelete]);
+
   const displayed    = viewMode === 'all' ? deliveries : searchResults;
   const isLoading    = viewMode === 'all' ? loading : searchLoading;
   const displayError = viewMode === 'all' ? error   : searchError;
@@ -63,7 +73,7 @@ export function RecordsTable() {
   const switchToSearch = () => { setViewMode('search'); setSearchResults([]); setSearchError(null); };
 
   const handleDelete = async (id: string) => {
-    setConfirmDeleteId(null);
+    setConfirmDelete(null);
     setDeletingId(id);
     setDeleteError(null);
     try {
@@ -264,46 +274,28 @@ export function RecordsTable() {
                         <span className={badge.cls}>{badge.label}</span>
                       </td>
                       <td onClick={(e) => e.stopPropagation()}>
-                        {confirmDeleteId === record.id ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                            <button
-                              onClick={() => handleDelete(record.id)}
-                              style={{ fontSize: 'var(--text-xs)', color: 'var(--color-danger)', fontWeight: 600, padding: '0.25rem 0.375rem' }}
-                              className="hover:underline"
-                            >
-                              Confirm
-                            </button>
-                            <button
-                              onClick={() => setConfirmDeleteId(null)}
-                              style={{ fontSize: 'var(--text-xs)', color: 'var(--color-subtle)', padding: '0.25rem 0.375rem' }}
-                              className="hover:underline"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const rect = e.currentTarget.getBoundingClientRect();
-                                setMenuState(menuState?.id === record.id ? null : {
-                                  id: record.id,
-                                  top: rect.bottom + 4,
-                                  right: window.innerWidth - rect.right,
-                                });
-                              }}
-                              className="p-1.5 rounded-md text-subtle hover:bg-wash hover:text-ink transition-colors"
-                              aria-label="More options"
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="1" />
-                                <circle cx="12" cy="5" r="1" />
-                                <circle cx="12" cy="19" r="1" />
-                              </svg>
-                            </button>
-                          </div>
-                        )}
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              setMenuState(menuState?.id === record.id ? null : {
+                                id: record.id,
+                                top: rect.bottom + 4,
+                                right: window.innerWidth - rect.right,
+                              });
+                            }}
+                            disabled={deletingId === record.id}
+                            className="p-1.5 rounded-md text-subtle hover:bg-wash hover:text-ink transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            aria-label="More options"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="1" />
+                              <circle cx="12" cy="5" r="1" />
+                              <circle cx="12" cy="19" r="1" />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -342,7 +334,11 @@ export function RecordsTable() {
             Edit
           </button>
           <button
-            onClick={() => { setMenuState(null); setConfirmDeleteId(menuState.id); }}
+            onClick={() => {
+              const { id, top, right } = menuState;
+              setMenuState(null);
+              setConfirmDelete({ id, top, right });
+            }}
             disabled={deletingId === menuState.id}
             onMouseEnter={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = 'var(--color-danger-bg)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
@@ -351,6 +347,77 @@ export function RecordsTable() {
             {deletingId === menuState.id ? 'Deleting…' : 'Delete'}
           </button>
         </div>
+      )}
+
+      {/* ── Delete confirmation popover ── */}
+      {confirmDelete && (
+        <>
+          <div
+            onMouseDown={() => setConfirmDelete(null)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'transparent',
+              zIndex: 55,
+            }}
+          />
+          <div
+            role="dialog"
+            aria-label="Confirm delete"
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              position: 'fixed',
+              top: confirmDelete.top,
+              right: confirmDelete.right,
+              width: '15rem',
+              backgroundColor: 'var(--color-canvas)',
+              border: '1px solid var(--color-line)',
+              borderRadius: '8px',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+              zIndex: 60,
+              padding: '0.875rem 1rem 0.75rem',
+            }}
+          >
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink)', fontWeight: 600, marginBottom: '0.25rem' }}>
+              Delete this record?
+            </p>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-subtle)', marginBottom: '0.875rem', lineHeight: 1.45 }}>
+              This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '0.375rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setConfirmDelete(null)}
+                style={{
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 500,
+                  color: 'var(--color-subtle)',
+                  padding: '0.375rem 0.625rem',
+                  borderRadius: '4px',
+                  transition: 'background-color 0.15s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-wash)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(confirmDelete.id)}
+                style={{
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 600,
+                  color: 'var(--color-danger)',
+                  padding: '0.375rem 0.625rem',
+                  borderRadius: '4px',
+                  transition: 'background-color 0.15s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-danger-bg)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {selectedRecord && (
